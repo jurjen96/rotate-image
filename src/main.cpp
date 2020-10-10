@@ -18,6 +18,7 @@ using namespace cv;
 
 using std::list;
 
+static bool endsWith(const string& str, const string& suffix);
 void move_frames(Mat &image, int shift, int x, int y, int width);
 void rotate_img(Mat &image, int nr_frames, int width);
 void join_threads(std::vector<std::thread> &threads);
@@ -26,19 +27,19 @@ void write_image(Mat &img, int fps, int time);
 
 std::mutex m;
 Mat tmpHead;
-
-const int fps = 30;
-
-VideoWriter out_capture("results.avi", VideoWriter::fourcc('M','J','P','G'), fps, Size(1024,1024));
+VideoWriter out_capture;
 
 int main(int argc, char *argv[])
 {
 	if (argc < 2) {
-		cout << "Usage ./main path/to/image.jpeg" << endl;
+		cout << "Usage ./main image.jpeg output.avi" << endl;
 		return 0;
 	}
 
+	const string fileOut = argc>=3 ? argv[2] : "results.avi";
+
 	Mat src = imread(argv[1],1);
+	const int fps = 30; // The fps for the output video
 
 	if (src.empty()) {
 		cerr << "Image not found!" << endl;
@@ -71,6 +72,15 @@ int main(int argc, char *argv[])
 	height = src.rows;
 
 	cout << "Loaded image, height: " << height << ", width: " << width << endl;
+	
+	// Try to open the video writer
+	out_capture.open(fileOut, VideoWriter::fourcc('M','J','P','G'), fps, Size(width,height));
+	if (!out_capture.isOpened() || !(endsWith(fileOut, ".avi") || endsWith(fileOut, ".mp4"))) {
+		cout << "Unable to open video writer, please check the output video format. Supported formats are: .avi and .mp4" << endl;
+		return 0;
+	}
+
+	cout << "Results will be written to: " << fileOut << endl;
 
 	int nr_frames = 2*log2(width/2); // y=a^x -> x = log_a(y)
 
@@ -82,9 +92,19 @@ int main(int argc, char *argv[])
 		write_image(src, fps, 1); // Add a pause of one second in video before next rotation
 	}
 
-	cout << "Done! Check the results.avi file in your folder" << endl;
+	cout << "Done! Check the " << fileOut << " file in your folder" << endl;
 
 	return 0;
+}
+
+/**
+ * Check if a string ends with a defined suffix
+ * 
+ * str: a reference to the whole string
+ * suffix: a sub string that we use to compare if str ends with this suffix
+ */
+static bool endsWith(const string& str, const string& suffix) {
+    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
 }
 
 /**
