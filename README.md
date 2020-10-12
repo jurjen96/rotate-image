@@ -7,13 +7,13 @@ recursion and apply translation to those segments.
 
 ## Idea
 When scrolling through Reddit, I saw the post of user u/Agha_shadi 
-show casing an image of Albert Einstein being rotated without rotating
+showcasing an image of Albert Einstein being rotated without rotating
 the segments, but only applying translation to the segments. 
 ([Original Post](https://www.reddit.com/r/blackmagicfuckery/comments/j4cn6q/recursively_rotating_segments_of_an_image_rotates/)).
 I'm currently trying to learn the C++ language, so I thought it would 
 be a nice challenge to create something similar in C++. After a lot 
 of trail and error, I finished my first C++ program :) If you know a 
-way to improve the code or have just general feedback; please open an 
+way to improve the code or just have general feedback; please open an 
 issue with your feedback so that I can adjust the code and learn from 
 it!
 
